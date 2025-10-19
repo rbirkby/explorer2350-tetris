@@ -8,26 +8,39 @@
 import random
 import time
 
-from explorer import BLACK, BLUE, CYAN, GREEN, MAGENTA, RED, WHITE, YELLOW, button_c, button_y, button_z, display
+from explorer import (
+    BLACK,
+    BLUE,
+    CYAN,
+    GREEN,
+    MAGENTA,
+    RED,
+    WHITE,
+    YELLOW,
+    button_c,
+    button_y,
+    button_z,
+    display,
+)
 
 ###########################################################################
 # base helper methods
 ###########################################################################
 
-last_button_press = 0
-
 
 # from https://github.com/pimoroni/explorer/blob/main/examples/main.py#L39
 def debounce(button, debounce_ms=200):
     """Simple button debounce function."""
-    global last_button_press  # noqa: PLW0603
+    if not hasattr(debounce, "last_press"):
+        debounce.last_press = 0
+
     try:
         value = button.value() == 0
-        if value and time.ticks_ms() - last_button_press > debounce_ms:
-            last_button_press = time.ticks_ms()
+        if value and time.ticks_ms() - debounce.last_press > debounce_ms:
+            debounce.last_press = time.ticks_ms()
             return True
     except NameError:
-        last_button_press = time.ticks_ms()
+        debounce.last_press = time.ticks_ms()
     return False
 
 
@@ -304,8 +317,12 @@ class Tetris:
     def rotate(self):
         assert self.current is not None
 
-        newdir = DIR["MIN"] if self.current["dir"] == DIR["MAX"] else self.current["dir"] + 1
-        if self.unoccupied(self.current["type"], self.current["x"], self.current["y"], newdir):
+        newdir = (
+            DIR["MIN"] if self.current["dir"] == DIR["MAX"] else self.current["dir"] + 1
+        )
+        if self.unoccupied(
+            self.current["type"], self.current["x"], self.current["y"], newdir
+        ):
             self.current["dir"] = newdir
 
     def drop(self):
@@ -318,7 +335,12 @@ class Tetris:
 
             assert self.current is not None
 
-            if self.occupied(self.current["type"], self.current["x"], self.current["y"], self.current["dir"]):
+            if self.occupied(
+                self.current["type"],
+                self.current["x"],
+                self.current["y"],
+                self.current["dir"],
+            ):
                 self.lose()
 
     def drop_piece(self):
@@ -329,7 +351,9 @@ class Tetris:
             self.current["x"],
             self.current["y"],
             self.current["dir"],
-            lambda x, y: self.set_block(x, y, self.current["type"] if self.current is not None else None),
+            lambda x, y: self.set_block(
+                x, y, self.current["type"] if self.current is not None else None
+            ),
         )
 
     def remove_lines(self):
@@ -387,7 +411,9 @@ class Tetris:
             for x in range(nx):
                 block = self.get_block(x, y)
                 if block:
-                    self.draw_block(x + COURT_X_OFFSET, y + COURT_Y_OFFSET, block["color"])
+                    self.draw_block(
+                        x + COURT_X_OFFSET, y + COURT_Y_OFFSET, block["color"]
+                    )
 
         display.set_pen(GREEN)
         left = int(COURT_X_OFFSET * self.dx)
@@ -402,7 +428,11 @@ class Tetris:
 
     def draw_next(self):
         assert self.next_piece is not None
-        direction = DIR["RIGHT"] if self.next_piece["type"] in (self.z, self.i, self.s, self.z, self.t) else DIR["UP"]
+        direction = (
+            DIR["RIGHT"]
+            if self.next_piece["type"] in (self.z, self.i, self.s, self.z, self.t)
+            else DIR["UP"]
+        )
         self.draw_piece(self.next_piece["type"], 1, 6, direction)
 
     def draw_score(self):
@@ -414,11 +444,19 @@ class Tetris:
         display.text(str(self.rows), int(self.dx / 2), 30)
 
     def draw_piece(self, piece_type, x, y, direction):
-        self.each_block(piece_type, x, y, direction, lambda x, y: self.draw_block(x, y, piece_type["color"]))
+        self.each_block(
+            piece_type,
+            x,
+            y,
+            direction,
+            lambda x, y: self.draw_block(x, y, piece_type["color"]),
+        )
 
     def draw_block(self, x, y, color):
         display.set_pen(color)
-        display.rectangle(int(x * self.dx), int(y * self.dy), int(self.dx), int(self.dy))
+        display.rectangle(
+            int(x * self.dx), int(y * self.dy), int(self.dx), int(self.dy)
+        )
 
 
 _game = Tetris()
