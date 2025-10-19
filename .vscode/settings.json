@@ -1,0 +1,39 @@
+{
+  "python.analysis.extraPaths": [
+    "./lib",
+    "./typings"
+  ],
+  "python.analysis.stubPath": "./typings",
+  "python.analysis.typeCheckingMode": "standard",
+  "python.analysis.diagnosticSeverityOverrides": {
+    // Using stub-only packages, so ignore missing module source warnings
+    "reportMissingModuleSource": "none"
+  },
+  "editor.rulers": [
+    80,
+    120
+  ],
+  "editor.formatOnSave": true,
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  },
+  "editor.renderWhitespace": "all",
+  "ruff.lineLength": 120,
+  "ruff.lint.select": [
+    "E",
+    "F",
+    "W",
+    "A",
+    "PLC",
+    "PLE",
+    "PLW",
+    "I"
+  ],
+  "ruff.exclude": [
+    "lib/explorer.py"
+  ],
+  "ruff.lint.ignore": [
+    "E741",
+  ],
+  "ruff.nativeServer": true
+}
